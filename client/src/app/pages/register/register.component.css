@@ -1,0 +1,18 @@
+.container {
+  max-width: 400px;
+  margin: 50px auto;
+}
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0 15px;
+}
+button {
+  padding: 10px 20px;
+}
+.error {
+  color: red;
+}
+.success {
+  color: green;
+}

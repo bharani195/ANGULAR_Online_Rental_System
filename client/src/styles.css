@@ -1,0 +1,88 @@
+@import "@angular/material/prebuilt-themes/pink-bluegrey.css";
+
+:root {
+	--rh-gap: 16px;
+	--rh-radius: 8px;
+
+	/* Vibrant animated gradient background */
+	--rh-bg: linear-gradient(135deg, #2f2c2b, #15243e, #605d5b);
+
+	/* Surface card style with frosted effect */
+	--rh-surface: linear-gradient(145deg, rgba(9, 9, 9, 0.85), rgba(61, 63, 68, 0.85));
+
+	/* Primary text color */
+	--rh-text: #f0f4fc;
+
+	/* Subtext/muted */
+	--rh-muted: rgb(246, 246, 246);
+
+	/* Angular accent (based on logo) */
+	--rh-accent-angular: #f80539;
+
+	/* Optional gradient accent for other elements */
+	--rh-accent: linear-gradient(135deg, #6134de, #b300ff);
+}
+
+body {
+	background: var(--rh-bg);
+	background-size: 300% 300%;
+	animation: animated-bg 20s ease infinite;
+	color: var(--rh-text);
+	font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
+	margin: 0;
+}
+
+@keyframes animated-bg {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 24px;
+}
+
+mat-card {
+	background: var(--rh-surface);
+	backdrop-filter: blur(10px);
+	border-radius: var(--rh-radius);
+	color: var(--rh-text);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+	transition: box-shadow 0.3s ease;
+	width: 100%;
+}
+
+mat-card:hover {
+	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Fixing header style */
+.hero-cta {
+	font-weight: 700;
+	font-size: 2.2rem;
+	color: var(--rh-text); /* Use solid color to avoid clipping issues */
+	text-align: center;
+	margin-bottom: 0.5rem;
+	position: relative;
+}
+
+/* Optional underline with Angular color */
+.hero-cta::after {
+	content: '';
+	display: block;
+	width: 60px;
+	height: 4px;
+	background-color: var(--rh-accent-angular);
+	margin: 8px auto 0;
+	border-radius: 2px;
+}
+
+/* Subtext style */
+.subtext {
+	color: var(--rh-muted);
+	font-size: 1.1rem;
+	text-align: center;
+}
+

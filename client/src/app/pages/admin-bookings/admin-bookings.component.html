@@ -1,0 +1,72 @@
+<div class="p-6">
+  <h2 class="text-2xl font-bold mb-4">📊 Admin Bookings Dashboard</h2>
+
+  <!-- Filter Tabs -->
+  <div class="flex gap-3 mb-6">
+    <button
+      *ngFor="let status of ['All', 'Pending', 'Confirmed', 'Cancelled']"
+      (click)="applyFilter(status)"
+      class="px-4 py-2 rounded-xl border shadow-sm transition"
+      [ngClass]="{
+        'bg-blue-500 text-white': activeFilter === status,
+        'bg-gray-100 text-gray-700 hover:bg-gray-200': activeFilter !== status
+      }"
+    >
+      {{ status }}
+    </button>
+  </div>
+
+  <div class="mb-4 flex items-center gap-3">
+    <input placeholder="Search by item or user" class="px-3 py-2 rounded-lg border w-full"
+           [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)" />
+    <div class="text-sm text-gray-600">Page {{page}} / {{ totalPages }}</div>
+  </div>
+
+  <div *ngIf="loading" class="text-gray-500">Loading bookings...</div>
+
+  <div *ngIf="!loading && filteredBookings.length === 0" class="text-gray-500">
+    No {{ activeFilter }} bookings found.
+  </div>
+
+  <div *ngFor="let booking of filteredBookings"
+       class="mb-4 p-4 rounded-2xl shadow-lg border border-gray-200 transition hover:shadow-xl bg-white">
+    <div class="flex justify-between items-center">
+      <div>
+        <p class="text-lg font-semibold">{{ booking.itemId?.name }}</p>
+        <p class="text-sm text-gray-600">Booked by: {{ booking.userId?.name || booking.userId?._id }}</p>
+        <p class="text-sm text-gray-600">From: {{ booking.startDate | date:'shortDate' }} → {{ booking.endDate | date:'shortDate' }}</p>
+      </div>
+
+      <div>
+        <span [ngClass]="{
+            'bg-yellow-200 text-yellow-800 px-2 py-1 rounded': booking.status?.toLowerCase() === 'pending',
+            'bg-green-200 text-green-800 px-2 py-1 rounded': booking.status?.toLowerCase() === 'confirmed',
+            'bg-red-200 text-red-800 px-2 py-1 rounded': booking.status?.toLowerCase() === 'cancelled'
+          }">
+          {{ booking.status | titlecase }}
+        </span>
+      </div>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+      <button *ngIf="booking.status?.toLowerCase() === 'pending'"
+              (click)="confirmBooking(booking._id)"
+              class="px-4 py-2 bg-green-500 text-white rounded-xl shadow hover:bg-green-600 transition">
+        ✅ Approve
+      </button>
+
+      <button *ngIf="booking.status?.toLowerCase() === 'pending'"
+              (click)="cancelBooking(booking._id)"
+              class="px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition">
+        ❌ Deny
+      </button>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="flex justify-between items-center mt-6">
+    <button (click)="goToPrevious()" class="px-4 py-2 bg-gray-200 rounded" [disabled]="page<=1">Previous</button>
+    <div class="text-sm text-gray-600">Showing {{ filteredBookings.length }} of {{ total }} results</div>
+    <button (click)="goToNext()" class="px-4 py-2 bg-gray-200 rounded" [disabled]="page >= totalPages">Next</button>
+  </div>
+</div>

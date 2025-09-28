@@ -1,0 +1,169 @@
+.item-card {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.item-card:hover {
+  transform: translateY(-2px);
+}
+
+.item-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.price-tag {
+  color: #2196f3;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.availability-badge {
+  display: flex;
+  align-items: center;
+  color: #4caf50;
+  font-weight: 500;
+  padding: 8px;
+  background-color: #e8f5e9;
+  border-radius: 4px;
+}
+
+/* Quantity Control Styles */
+.quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.quantity-control input {
+  width: 60px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  margin: 0 8px;
+}
+
+.quantity-control button {
+  color: #2196f3;
+}
+
+/* Summary Card Styles */
+.summary-card {
+  background-color: #f8f9fa;
+  border: none;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-item .label {
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.summary-item .value {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.summary-item.total {
+  grid-column: 1 / -1;
+  border-top: 1px solid #dee2e6;
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+.summary-item.total .value {
+  font-size: 1.5rem;
+  color: #2196f3;
+}
+
+.date-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+/* Form Fields Styles */
+mat-form-field {
+  margin-bottom: 16px;
+}
+
+.mat-mdc-card-header {
+  padding: 16px;
+  background-color: #f8f9fa;
+}
+
+.mat-mdc-card-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Date Picker Styles */
+::ng-deep .mat-date-range-input {
+  min-height: 56px;
+}
+
+::ng-deep .mat-date-range-input-container {
+  align-items: center;
+}
+
+::ng-deep .mat-date-range-input-start-wrapper,
+::ng-deep .mat-date-range-input-end-wrapper {
+  flex: 1;
+}
+
+::ng-deep .mat-date-range-input-separator {
+  color: #666;
+  margin: 0 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .quantity-control input {
+    width: 50px;
+  }
+}
+
+@media (max-width: 576px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .date-summary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

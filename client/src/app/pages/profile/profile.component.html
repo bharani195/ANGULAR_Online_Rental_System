@@ -1,0 +1,26 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4">
+  <mat-card *ngIf="user">
+    <mat-card-header>
+      <mat-card-title>{{ user.name }}</mat-card-title>
+      <mat-card-subtitle>{{ user.email || '' }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <p><strong>Role:</strong> {{ user.role || 'user' }}</p>
+      <p><strong>User ID:</strong> {{ user.id || user._id || '' }}</p>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-flat-button color="warn" (click)="logout()">Logout</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <div *ngIf="!user" class="text-center">
+    <p>No user info found. Please login.</p>
+    <a routerLink="/login" class="btn btn-primary">Login</a>
+  </div>
+</div>
+
+<app-footer></app-footer>

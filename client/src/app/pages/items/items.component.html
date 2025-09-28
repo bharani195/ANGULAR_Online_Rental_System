@@ -1,0 +1,81 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4">
+  <div class="hero-section text-center mb-5">
+    <h1 class="hero-cta">Explore Rental Items</h1>
+    <p class="subtext">Find and book the perfect item for your needs</p>
+  </div>
+
+  <!-- Category Tabs -->
+  <mat-tab-group [selectedIndex]="categories.indexOf(selectedCategory)" 
+                 (selectedIndexChange)="selectedCategory = categories[$event]; applyFilter();"
+                 class="custom-tabs">
+    <mat-tab *ngFor="let c of categories" [label]="c === 'all' ? 'All Items' : (c | titlecase)">
+      <ng-template matTabContent>
+        <!-- Category Description -->
+        <div class="category-info" *ngIf="c !== 'all'">
+          <mat-icon>{{getCategoryIcon(c)}}</mat-icon>
+          <p>{{getCategoryDescription(c)}}</p>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <mat-spinner diameter="40" class="mx-auto"></mat-spinner>
+    <p class="mt-3">Loading available items...</p>
+  </div>
+
+  <!-- No Items State -->
+  <div *ngIf="!loading && filtered.length === 0" class="text-center py-5">
+    <mat-icon class="large-icon">search_off</mat-icon>
+    <p class="mt-3">No items found in this category</p>
+  </div>
+
+  <!-- Items Grid -->
+  <div class="items-grid mt-4" *ngIf="!loading && filtered.length > 0">
+    <mat-card class="item-card" *ngFor="let item of filtered">
+      <mat-card-header>
+        <mat-card-title>{{item.name}}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-chip-set>
+            <mat-chip [color]="item.available ? 'accent' : 'warn'" selected>
+              {{item.available ? 'Available' : 'Booked'}}
+            </mat-chip>
+          </mat-chip-set>
+        </mat-card-subtitle>
+      </mat-card-header>
+
+  <img mat-card-image [src]="item.image || getCategoryImage(item.category)" [alt]="item.name">
+
+      <mat-card-content>
+        <p class="description">{{item.description}}</p>
+        <div class="features">
+          <div class="feature">
+            <mat-icon>attach_money</mat-icon>
+            <span class="price">${{item.pricePerDay}}/day</span>
+          </div>
+          <div class="feature">
+            <mat-icon>category</mat-icon>
+            <span>{{item.category | titlecase}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-stroked-button color="primary" (click)="showDetails(item)">
+          <mat-icon>info</mat-icon> Details
+        </button>
+        <button mat-flat-button color="primary" 
+                (click)="bookItem(item._id)" 
+                [disabled]="!item.available">
+          <mat-icon>{{item.available ? 'book_online' : 'block'}}</mat-icon>
+          {{item.available ? 'Book Now' : 'Unavailable'}}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
+
+<app-footer></app-footer>

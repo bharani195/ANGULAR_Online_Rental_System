@@ -1,0 +1,98 @@
+<mat-card class="booking-dialog">
+  <mat-card-header>
+    <mat-card-title>Book: {{ data.name }}</mat-card-title>
+    <mat-card-subtitle>
+      {{ data.price | currency }} / day
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content class="dialog-content">
+    <div class="left">
+      <div class="img">
+        <img [src]="data.image" [alt]="data.name" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+      </div>
+      <div class="meta">
+        <div><strong>Price:</strong> {{ data.price | currency }}</div>
+        <div><strong>Category:</strong> {{ data.category || '—' }}</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <form [formGroup]="form">
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Select Dates</mat-label>
+          <mat-date-range-input [rangePicker]="picker" [min]="minDate" [max]="maxDate">
+            <input matStartDate formControlName="start" placeholder="Start date">
+            <input matEndDate formControlName="end" placeholder="End date">
+          </mat-date-range-input>
+          <mat-hint>Select dates between {{minDate | date}} and {{maxDate | date}}</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+          <mat-error *ngIf="form.get('start')?.hasError('required') || form.get('end')?.hasError('required')">
+            Both dates are required
+          </mat-error>
+          <mat-error *ngIf="form.get('start')?.hasError('pastDate')">
+            Start date cannot be in the past
+          </mat-error>
+          <mat-error *ngIf="form.get('end')?.hasError('pastDate')">
+            End date cannot be in the past
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Quantity</mat-label>
+          <input matInput type="number" formControlName="quantity" min="1" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Payment method</mat-label>
+          <mat-select formControlName="paymentMethod">
+            <mat-option value="card">Card</mat-option>
+            <mat-option value="upi">UPI</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Card payment fields -->
+        <ng-container *ngIf="form.get('paymentMethod')?.value === 'card'">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Card number</mat-label>
+            <input matInput formControlName="cardNumber" placeholder="1234 5678 9012 3456" maxlength="16">
+            <mat-error *ngIf="form.get('cardNumber')?.errors?.['required']">Card number is required</mat-error>
+            <mat-error *ngIf="form.get('cardNumber')?.errors?.['pattern']">Invalid card number format</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Expiry date</mat-label>
+            <input matInput formControlName="cardExpiry" placeholder="MM/YY" maxlength="5">
+            <mat-error *ngIf="form.get('cardExpiry')?.errors?.['required']">Expiry date is required</mat-error>
+            <mat-error *ngIf="form.get('cardExpiry')?.errors?.['pattern']">Invalid expiry date format (MM/YY)</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>CVV</mat-label>
+            <input matInput formControlName="cardCvv" placeholder="123" maxlength="4">
+            <mat-error *ngIf="form.get('cardCvv')?.errors?.['required']">CVV is required</mat-error>
+            <mat-error *ngIf="form.get('cardCvv')?.errors?.['pattern']">Invalid CVV format</mat-error>
+          </mat-form-field>
+        </ng-container>
+
+        <!-- UPI payment fields -->
+        <ng-container *ngIf="form.get('paymentMethod')?.value === 'upi'">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>UPI ID</mat-label>
+            <input matInput formControlName="upiId" placeholder="username@bank">
+            <mat-error *ngIf="form.get('upiId')?.errors?.['required']">UPI ID is required</mat-error>
+            <mat-error *ngIf="form.get('upiId')?.errors?.['pattern']">Invalid UPI ID format</mat-error>
+          </mat-form-field>
+        </ng-container>
+
+        <div class="total">Total: <strong>{{ total | currency }}</strong></div>
+
+        <div class="actions">
+          <button mat-flat-button color="primary" type="submit" (click)="submit()">Pay & Book</button>
+          <button mat-stroked-button color="warn" type="button" (click)="cancel()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </mat-card-content>
+</mat-card>

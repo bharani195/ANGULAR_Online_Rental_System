@@ -1,0 +1,10 @@
+.admin-bookings {
+  padding: 1rem;
+}
+
+.admin-bookings .booking-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}

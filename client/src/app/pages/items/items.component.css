@@ -1,0 +1,117 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.hero-section {
+  padding: 40px 0;
+  background: var(--rh-surface);
+  border-radius: var(--rh-radius);
+  margin-bottom: 2rem;
+}
+
+.hero-cta {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  background: var(--rh-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.subtext {
+  font-size: 1.2rem;
+  color: var(--rh-muted);
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem;
+  background: var(--rh-surface);
+  border-radius: var(--rh-radius);
+  margin: 1rem 0;
+}
+
+.category-info mat-icon {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 1rem 0;
+}
+
+.item-card {
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.item-card:hover {
+  transform: translateY(-5px);
+}
+
+.item-card mat-card-header {
+  padding: 16px;
+}
+
+.item-card img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.description {
+  color: var(--rh-muted);
+  margin: 1rem 0;
+}
+
+.features {
+  display: flex;
+  gap: 20px;
+  margin-top: 1rem;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price {
+  font-weight: bold;
+  color: var(--rh-accent-angular);
+}
+
+mat-card-actions {
+  padding: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.large-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  opacity: 0.5;
+}
+
+/* Custom tabs styling */
+.custom-tabs {
+  margin-bottom: 2rem;
+}
+
+.mat-tab-label {
+  opacity: 1 !important;
+}
+
+/* Loading spinner center alignment */
+mat-spinner {
+  margin: 0 auto;
+}

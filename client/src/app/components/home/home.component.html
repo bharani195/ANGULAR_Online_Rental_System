@@ -1,0 +1,87 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to RentEasy</h1>
+      <p>Your one-stop platform for renting bikes, cars, books, and rooms</p>
+      <div class="hero-actions">
+        <a routerLink="/items" class="btn btn-primary">Browse Items</a>
+        <a routerLink="/register" class="btn btn-secondary">Join Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="categories">
+    <div class="container">
+      <h2>What would you like to rent?</h2>
+      <div class="categories-grid">
+        <div class="category-card" *ngFor="let category of categories" 
+             (click)="onCategoryClick(category.name)">
+          <div class="category-icon">{{ category.icon }}</div>
+          <h3>{{ category.displayName }}</h3>
+          <p>Find and rent {{ category.displayName.toLowerCase() }} near you</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Items Section -->
+  <section class="featured-items">
+    <div class="container">
+      <h2>Featured Items</h2>
+      <div class="items-grid" *ngIf="featuredItems.length > 0; else noItems">
+        <div class="item-card" *ngFor="let item of featuredItems">
+          <div class="item-image">
+            <img [src]="item.images[0] || '/assets/placeholder.jpg'" 
+                 [alt]="item.title">
+            <div class="item-category">{{ item.category }}</div>
+          </div>
+          <div class="item-content">
+            <h3>{{ item.title }}</h3>
+            <p class="item-location">📍 {{ item.location }}</p>
+            <p class="item-price">${{ item.pricePerDay }}/day</p>
+            <div class="item-rating" *ngIf="item.rating.count > 0">
+              <span class="stars">⭐ {{ item.rating.average }}</span>
+              <span class="reviews">({{ item.rating.count }} reviews)</span>
+            </div>
+            <a [routerLink]="['/items', item._id]" class="btn btn-sm btn-primary">
+              View Details
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <ng-template #noItems>
+        <div class="no-items">
+          <p>No featured items available at the moment.</p>
+          <a routerLink="/items" class="btn btn-primary">Browse All Items</a>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works">
+    <div class="container">
+      <h2>How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Browse</h3>
+          <p>Search for items you want to rent from our wide selection</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Book</h3>
+          <p>Select your dates and make a booking request</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Enjoy</h3>
+          <p>Meet with the owner and enjoy your rental</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

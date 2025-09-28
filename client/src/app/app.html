@@ -1,0 +1,31 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <h2>RentEasy</h2>
+    </div>
+    <div class="navbar-menu">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/items" routerLinkActive="active">Browse Items</a>
+      @if (currentUser) {
+        <a routerLink="/my-bookings" routerLinkActive="active">My Bookings</a>
+        <a routerLink="/my-items" routerLinkActive="active">My Items</a>
+        @if (currentUser.role === 'admin') {
+          <a routerLink="/admin" routerLinkActive="active">Admin</a>
+        }
+        <div class="user-menu">
+          <span>{{ currentUser.name }}</span>
+          <button (click)="logout()" class="logout-btn">Logout</button>
+        </div>
+      } @else {
+        <div class="auth-buttons">
+          <a routerLink="/login" routerLinkActive="active">Login</a>
+          <a routerLink="/register" routerLinkActive="active" class="register-btn">Register</a>
+        </div>
+      }
+    </div>
+  </div>
+</nav>
+
+<main class="main-content">
+  <router-outlet />
+</main>

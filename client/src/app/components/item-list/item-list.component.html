@@ -1,0 +1,167 @@
+<div class="items-container">
+  <!-- Header -->
+  <div class="items-header">
+    <h1>Browse Items</h1>
+    <p>Find the perfect item to rent from our collection</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <!-- Search -->
+      <div class="search-box">
+        <input 
+          type="text" 
+          placeholder="Search items..." 
+          [(ngModel)]="filter.search"
+          (keyup.enter)="onSearch()"
+          class="form-control"
+        >
+        <button (click)="onSearch()" class="btn btn-primary">Search</button>
+      </div>
+
+      <!-- Category Filter -->
+      <select [(ngModel)]="filter.category" (change)="onFilterChange()" class="form-control">
+        <option *ngFor="let category of categories" [value]="category.value">
+          {{ category.label }}
+        </option>
+      </select>
+
+      <!-- Sort Options -->
+      <select [(ngModel)]="filter.sortBy" (change)="onSortChange()" class="form-control">
+        <option *ngFor="let sort of sortOptions" [value]="sort.value">
+          {{ sort.label }}
+        </option>
+      </select>
+
+      <!-- Clear Filters -->
+      <button (click)="clearFilters()" class="btn btn-secondary">Clear All</button>
+    </div>
+
+    <!-- Price Range -->
+    <div class="price-filters">
+      <div class="price-input">
+        <label>Min Price ($)</label>
+        <input 
+          type="number" 
+          [(ngModel)]="filter.minPrice" 
+          (change)="onFilterChange()"
+          placeholder="0"
+          class="form-control"
+        >
+      </div>
+      <div class="price-input">
+        <label>Max Price ($)</label>
+        <input 
+          type="number" 
+          [(ngModel)]="filter.maxPrice" 
+          (change)="onFilterChange()"
+          placeholder="1000"
+          class="form-control"
+        >
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading items...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <div class="alert alert-danger">{{ error }}</div>
+  </div>
+
+  <!-- Items Grid -->
+  <div *ngIf="!loading && !error" class="items-content">
+    <div *ngIf="items.length > 0; else noItems" class="items-grid">
+      <div class="item-card" *ngFor="let item of items">
+        <div class="item-image">
+          <img [src]="item.images[0] || '/assets/placeholder.jpg'" [alt]="item.title">
+          <div class="item-category">{{ item.category }}</div>
+          <div class="item-availability" [class.unavailable]="!item.availability">
+            {{ item.availability ? 'Available' : 'Unavailable' }}
+          </div>
+        </div>
+        
+        <div class="item-content">
+          <h3>{{ item.title }}</h3>
+          <p class="item-description">{{ item.description | slice:0:100 }}...</p>
+          <div class="item-location">📍 {{ item.location }}</div>
+          
+          <div class="item-details">
+            <div class="item-price">${{ item.pricePerDay }}<span>/day</span></div>
+            
+            <div class="item-rating" *ngIf="item.rating.count > 0">
+              <div class="stars">
+                <span *ngFor="let star of getStarRating(item.rating.average)" 
+                      [class.filled]="star === '★'">{{ star }}</span>
+              </div>
+              <span class="rating-text">{{ item.rating.average }} ({{ item.rating.count }})</span>
+            </div>
+          </div>
+
+          <div class="item-features" *ngIf="item.features.length > 0">
+            <span class="feature-tag" *ngFor="let feature of item.features.slice(0, 3)">
+              {{ feature }}
+            </span>
+            <span *ngIf="item.features.length > 3" class="more-features">
+              +{{ item.features.length - 3 }} more
+            </span>
+          </div>
+
+          <div class="item-actions">
+            <a [routerLink]="['/items', item._id]" class="btn btn-primary">
+              View Details
+            </a>
+            <button class="btn btn-secondary" [disabled]="!item.availability">
+              Quick Book
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Items Found -->
+    <ng-template #noItems>
+      <div class="no-items">
+        <div class="no-items-icon">🔍</div>
+        <h3>No items found</h3>
+        <p>Try adjusting your search criteria or browse different categories.</p>
+        <button (click)="clearFilters()" class="btn btn-primary">Clear Filters</button>
+      </div>
+    </ng-template>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="pagination">
+      <button 
+        (click)="onPageChange(currentPage - 1)"
+        [disabled]="currentPage === 1"
+        class="btn btn-secondary"
+      >
+        Previous
+      </button>
+      
+      <span class="page-numbers">
+        <button 
+          *ngFor="let page of getPagesArray()"
+          (click)="onPageChange(page)"
+          [class.active]="page === currentPage"
+          class="btn btn-outline"
+        >
+          {{ page }}
+        </button>
+      </span>
+      
+      <button 
+        (click)="onPageChange(currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+        class="btn btn-secondary"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>

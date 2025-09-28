@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { User, LoginCredentials, RegisterData, AuthResponse } from '../models/user.model';
+import { MockDataService } from './mock-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,11 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient, 
+    private router: Router,
+    private mockDataService: MockDataService
+  ) {
     // Check if user is already logged in
     const token = this.getToken();
     if (token) {
@@ -36,6 +41,17 @@ export class AuthService {
         tap(response => {
           this.setToken(response.token);
           this.currentUserSubject.next(response.user);
+        }),
+        catchError(() => {
+          // Fallback to mock authentication
+          console.log('Backend not available, using mock authentication');
+          return this.mockDataService.mockLogin(credentials.email, credentials.password)
+            .pipe(
+              tap(response => {
+                this.setToken(response.token);
+                this.currentUserSubject.next(response.user);
+              })
+            );
         })
       );
   }
@@ -52,6 +68,22 @@ export class AuthService {
     }).pipe(
       tap(response => {
         this.currentUserSubject.next(response.user);
+      }),
+      catchError(() => {
+        // If backend is not available, check for token and mock user
+        const token = this.getToken();
+        if (token && token.startsWith('mock-jwt-token-')) {
+          const userId = token.replace('mock-jwt-token-', '');
+          const mockUser: User = {
+            id: userId,
+            name: userId === '1' ? 'Admin User' : userId === '2' ? 'John Doe' : 'Jane Smith',
+            email: userId === '1' ? 'admin@renteasy.com' : userId === '2' ? 'john@example.com' : 'jane@example.com',
+            role: userId === '1' ? 'admin' : 'user'
+          };
+          this.currentUserSubject.next(mockUser);
+          return throwError(() => new Error('Using mock data'));
+        }
+        return throwError(() => new Error('Not authenticated'));
       })
     );
   }

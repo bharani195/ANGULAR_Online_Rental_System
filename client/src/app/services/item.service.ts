@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 import { Item, ItemFilter, ItemResponse, CreateItemData, ItemCategory } from '../models/item.model';
 import { AuthService } from './auth.service';
+import { MockDataService } from './mock-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,11 @@ import { AuthService } from './auth.service';
 export class ItemService {
   private apiUrl = '/api/items';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient, 
+    private authService: AuthService,
+    private mockDataService: MockDataService
+  ) {}
 
   getItems(filter?: ItemFilter): Observable<ItemResponse> {
     let params = new HttpParams();
@@ -24,11 +29,22 @@ export class ItemService {
       });
     }
 
-    return this.http.get<ItemResponse>(this.apiUrl, { params });
+    return this.http.get<ItemResponse>(this.apiUrl, { params }).pipe(
+      catchError(() => {
+        // Fallback to mock data if backend is not available
+        console.log('Backend not available, using mock data');
+        return this.mockDataService.getMockItems(filter);
+      })
+    );
   }
 
   getItemById(id: string): Observable<Item> {
-    return this.http.get<Item>(`${this.apiUrl}/${id}`);
+    return this.http.get<Item>(`${this.apiUrl}/${id}`).pipe(
+      catchError(() => {
+        console.log('Backend not available, using mock data');
+        return this.mockDataService.getMockItem(id) as Observable<Item>;
+      })
+    );
   }
 
   getItemsByCategory(category: ItemCategory, page: number = 1, limit: number = 10): Observable<ItemResponse> {
@@ -36,7 +52,12 @@ export class ItemService {
       .set('page', page.toString())
       .set('limit', limit.toString());
 
-    return this.http.get<ItemResponse>(`${this.apiUrl}/category/${category}`, { params });
+    return this.http.get<ItemResponse>(`${this.apiUrl}/category/${category}`, { params }).pipe(
+      catchError(() => {
+        console.log('Backend not available, using mock data');
+        return this.mockDataService.getMockItems({ category, page, limit });
+      })
+    );
   }
 
   createItem(itemData: CreateItemData): Observable<{ message: string; item: Item }> {
@@ -63,6 +84,11 @@ export class ItemService {
       .set('page', page.toString())
       .set('limit', limit.toString());
 
-    return this.http.get<ItemResponse>(this.apiUrl, { params });
+    return this.http.get<ItemResponse>(this.apiUrl, { params }).pipe(
+      catchError(() => {
+        console.log('Backend not available, using mock data');
+        return this.mockDataService.getMockItems({ search: query, page, limit });
+      })
+    );
   }
 }

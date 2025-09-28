@@ -1,0 +1,23 @@
+<mat-toolbar color="primary" class="rh-toolbar">
+  <span class="brand" routerLink="/">RentalHub</span>
+
+  <span class="nav-center">
+    <a mat-button routerLink="/">Home</a>
+  <a mat-button routerLink="/items">Items</a>
+  <a mat-button routerLink="/bookings">Bookings</a>
+  <a *ngIf="isAdmin()" mat-button routerLink="/admin/bookings">Admin</a>
+  </span>
+
+  <span class="spacer"></span>
+
+  <span class="nav-actions">
+    <a *ngIf="!isLoggedIn()" mat-button routerLink="/login">Login</a>
+    <a *ngIf="!isLoggedIn()" mat-button routerLink="/register">Register</a>
+
+    <!-- when logged in, show profile name and logout -->
+    <ng-container *ngIf="isLoggedIn()">
+      <a mat-button routerLink="/profile">{{ getUserName() || 'Profile' }}</a>
+      <button mat-flat-button color="warn" (click)="logout()">Logout</button>
+    </ng-container>
+  </span>
+</mat-toolbar>

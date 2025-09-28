@@ -1,0 +1,6 @@
+.rh-toolbar { background: var(--rh-surface); color: var(--rh-text); }
+.rh-toolbar .brand { font-weight:700; font-size:1.15rem; cursor:pointer; margin-right:16px }
+.rh-toolbar .nav-center { display:flex; gap:12px; margin:auto; }
+.rh-toolbar .nav-actions { display:flex; gap:8px; align-items:center }
+.spacer { flex:1 1 auto }
+.rh-toolbar a[mat-button], .rh-toolbar button[mat-flat-button] { color:var(--rh-text) }

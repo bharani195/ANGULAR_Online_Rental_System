@@ -1,0 +1,195 @@
+import { Component, Inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { PaymentService } from '../../services/payment.service';
+import { BookingService } from '../../services/booking.service';
+import { AuthService } from '../../services/auth.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
+interface DialogData {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  description: string;
+  viewOnly?: boolean;
+}
+
+interface PaymentPayload {
+  method: 'card' | 'upi';
+  amount: number;
+  cardNumber?: string;
+  cardExpiry?: string;
+  cardCvv?: string;
+  upiId?: string;
+}
+
+@Component({
+  selector: 'app-booking-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+    MatSelectModule,
+    MatSnackBarModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],
+  templateUrl: './booking-dialog.component.html',
+  styleUrls: ['./booking-dialog.component.css']
+})
+export class BookingDialogComponent implements OnInit {
+  form: FormGroup;
+  minDate = new Date();
+  total = 0;
+
+  constructor(
+    public dialogRef: MatDialogRef<BookingDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+    private fb: FormBuilder,
+    private bookingService: BookingService,
+    private payment: PaymentService,
+    private auth: AuthService,
+    private snack: MatSnackBar
+  ) {
+    this.form = this.initForm();
+  }
+
+  ngOnInit(): void {
+    this.setupPaymentValidation();
+    this.updateTotal();
+
+    // Watch for form changes that affect total
+    this.form.valueChanges.subscribe(() => {
+      this.updateTotal();
+    });
+  }
+
+  private initForm(): FormGroup {
+    return this.fb.group({
+      start: [null, Validators.required],
+      end: [null, Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      paymentMethod: ['upi', Validators.required],
+      cardNumber: [''],
+      cardExpiry: [''],
+      cardCvv: [''],
+      upiId: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/)]]
+    });
+  }
+
+  private setupPaymentValidation(): void {
+    const paymentMethod = this.form.get('paymentMethod');
+    if (!paymentMethod) return;
+
+    paymentMethod.valueChanges.subscribe((method: 'card' | 'upi') => {
+      const upiId = this.form.get('upiId');
+      const cardFields = ['cardNumber', 'cardExpiry', 'cardCvv'];
+      
+      if (method === 'upi') {
+        upiId?.setValidators([Validators.required, Validators.pattern(/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/)]);
+        cardFields.forEach(field => this.form.get(field)?.clearValidators());
+      } else {
+        upiId?.clearValidators();
+        cardFields.forEach(field => this.form.get(field)?.setValidators(Validators.required));
+      }
+      
+      [upiId, ...cardFields.map(f => this.form.get(f))].forEach(control => control?.updateValueAndValidity());
+    });
+  }
+
+  private updateTotal(): void {
+    const start = this.form.get('start')?.value;
+    const end = this.form.get('end')?.value;
+    const quantity = this.form.get('quantity')?.value || 1;
+
+    if (!start || !end || !this.data?.price) {
+      this.total = 0;
+      return;
+    }
+
+    const days = Math.max(1, Math.ceil((new Date(end).getTime() - new Date(start).getTime()) / (1000 * 60 * 60 * 24)));
+    this.total = this.data.price * days * quantity;
+  }
+
+  submit(): void {
+    if (this.form.invalid) {
+      this.snack.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const userId = this.auth.getCurrentUserId();
+    if (!userId) {
+      this.snack.open('Please login to continue', 'Close', { duration: 3000 });
+      return;
+    }
+
+    if (!this.data?.id) {
+      this.snack.open('Invalid item selected', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const formValue = this.form.value;
+    if (!formValue.start || !formValue.end || !formValue.quantity) {
+      this.snack.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const payload: PaymentPayload = {
+      method: formValue.paymentMethod,
+      amount: this.total,
+      ...(formValue.paymentMethod === 'card' ? {
+        cardNumber: formValue.cardNumber,
+        cardExpiry: formValue.cardExpiry,
+        cardCvv: formValue.cardCvv
+      } : {
+        upiId: formValue.upiId
+      })
+    };
+
+    this.payment.processPayment(payload).subscribe({
+      next: (paymentRes) => {
+        const booking = {
+          user: userId,
+          item: this.data.id,
+          startDate: new Date(formValue.start).toISOString(),
+          endDate: new Date(formValue.end).toISOString(),
+          quantity: formValue.quantity,
+          totalAmount: this.total,
+          status: 'confirmed' as const,
+          paymentId: paymentRes.transactionId
+        };
+
+        this.bookingService.createBooking(booking).subscribe({
+          next: () => {
+            this.snack.open('Booking confirmed successfully! Transaction ID: ' + paymentRes.transactionId, 'Close', { duration: 3000 });
+            this.dialogRef.close(true);
+          },
+          error: (error) => {
+            this.snack.open(error.error?.message || 'Failed to create booking', 'Close', { duration: 3000 });
+          }
+        });
+      },
+      error: (error) => {
+        this.snack.open(error.error?.message || 'Payment failed', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  cancel(): void {
+    this.dialogRef.close(false);
+  }
+}

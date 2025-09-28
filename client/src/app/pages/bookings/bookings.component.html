@@ -1,0 +1,30 @@
+<div class="bookings-page">
+  <h2>My Bookings</h2>
+
+  <div *ngIf="loading">Loading your bookings...</div>
+
+  <div *ngIf="!loading && bookings.length === 0" class="no-bookings">
+    <p>You have no bookings yet. Start exploring items!</p>
+  </div>
+
+  <div class="booking-list" *ngIf="bookings.length > 0">
+    <div class="booking-card" *ngFor="let b of bookings">
+      <div class="header">
+        <h3>{{ b.item?.name || b.item?.title || 'Item' }}</h3>
+        <span class="status" [ngClass]="b.status">{{ b.status }}</span>
+      </div>
+
+      <p>Category: {{ b.item?.category }}</p>
+      <p>From: {{ b.startDate | date }}</p>
+      <p>To: {{ b.endDate | date }}</p>
+
+      <div *ngIf="b.status === 'confirmed'" class="countdown">
+        ⏳ {{ daysLeft(b.endDate) }} days left
+      </div>
+
+      <div class="actions" *ngIf="b.status === 'pending' || b.status === 'confirmed'">
+        <button mat-stroked-button color="warn" (click)="cancelBooking(b._id)">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

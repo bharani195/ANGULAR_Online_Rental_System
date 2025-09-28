@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@angular-devkit/build-angular": "^20.3.3",
+    "@angular/cli": "^20.3.3"
+  }
+}

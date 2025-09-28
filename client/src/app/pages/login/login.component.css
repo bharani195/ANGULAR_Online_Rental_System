@@ -1,0 +1,24 @@
+/* Center the card vertically and horizontally */
+.login-page{
+	min-height: calc(100vh - 64px);
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	padding:24px;
+}
+
+.login-card{width:100%; max-width:480px; background:var(--rh-surface); color:var(--rh-text); padding:8px 0; box-shadow: 0 8px 30px rgba(2,6,23,0.6)}
+.login-title{font-size:1.65rem; font-weight:700; padding:12px 24px}
+.full-width{width:100%}
+.login-form{display:flex; flex-direction:column; gap:14px; padding:8px 24px 18px}
+.login-form .mat-form-field { width:100% }
+.mat-form-field-infix { min-height:48px }
+.actions{display:flex; justify-content:flex-end; margin-top:6px}
+.actions button { min-width:120px; display:flex; align-items:center; gap:8px }
+.row-between{display:flex; align-items:center; justify-content:space-between}
+.row-between mat-checkbox { color:var(--rh-muted) }
+.mat-spinner { width:18px; height:18px }
+.error-msg{color:#ff6b6b; margin-top:4px; font-size:0.95rem}
+.login-card .mat-card-header { padding: 8px 24px }
+.login-card .mat-card-content { padding-top: 4px }
+
